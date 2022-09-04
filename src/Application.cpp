@@ -15,6 +15,23 @@
 #include <GLFW/glfw3.h>
 #include <iostream>
 
+static int compileShader(unsigned int type, const std::string& source) {
+    unsigned int shdrId = glCreateShader(type);
+    const char* shdrCode = source.c_str();
+    glShaderSource(shdrId, 1, &shdrCode, NULL);
+    glCompileShader(shdrId);
+
+    return shdrId;
+
+}
+
+static int createShader(const std::string& vertexShader, const std::string& fragmentShader) {
+    unsigned int program = glCreateProgram();
+    unsigned int vertexShdr = compileShader(GL_VERTEX_SHADER, vertexShader);
+    
+
+}
+
 int main(void)
 {
     GLFWwindow* window;
@@ -68,11 +85,6 @@ int main(void)
 
         glDrawArrays(GL_TRIANGLES, 0,3);
 
-        /*glBegin(GL_TRIANGLES);
-
-        glVertex2f(-0.5f, -0.5f);
-        glVertex2f(0.0f, 0.5f);
-        glVertex2f(0.5f, -0.5f);*/
 
         glEnd();
 
