@@ -1,9 +1,12 @@
+#include <GL/glew.h>
+
 #include <GLFW/glfw3.h>
 
 int main(void)
 {
     GLFWwindow* window;
 
+    glewInit();
     /* Initialize the library */
     if (!glfwInit())
         return -1;
