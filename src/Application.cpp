@@ -105,10 +105,11 @@ int main(void)
 
     std::string vertexShader = "#version 330 core\n"
         "\n"
-        "layout(location = 0) in vec4 position;\n"
+        "layout(location = 0) in vec4 position;"
         "void main(){\n"
-        "gl_position = position; "
+        "gl_Position = position; "
         "\n}";
+
     std::string fragmentShader = "#version 330 core\n"
         "\n"
         "layout(location = 0) out vec4 color;\n"
@@ -138,6 +139,7 @@ int main(void)
         /* Poll for and process events */
         glfwPollEvents();
     }
+    glDeleteProgram(shader);
 
     glfwTerminate();
     return 0;
