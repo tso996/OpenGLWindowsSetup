@@ -15,20 +15,48 @@
 #include <GLFW/glfw3.h>
 #include <iostream>
 
-static int compileShader(unsigned int type, const std::string& source) {
+static int compileShader(unsigned int type, const std::string& source) {//it needs to actually be a reference to the original string so that the pointer is valid even if the function is over
     unsigned int shdrId = glCreateShader(type);
     const char* shdrCode = source.c_str();
     glShaderSource(shdrId, 1, &shdrCode, NULL);
     glCompileShader(shdrId);
+    //maybe some error handling here
+    int result{};
+    glGetShaderiv(shdrId, GL_COMPILE_STATUS, &result);
+
+    if (result!=GL_FALSE) {
+        std::cout << "shader compiled ok.." << std::endl;
+    }
+    else {
+        std::cout << "shader compilation error" << std::endl;
+        int length{};
+        glGetShaderiv(shdrId, GL_INFO_LOG_LENGTH, &length);
+        char* message = (char*)alloca(sizeof(char) * length);
+        glGetShaderInfoLog(shdrId, length, &length, message);
+        std::cout << "could not compile correctly: " << (type == GL_VERTEX_SHADER ? "vertex" : "fragment") << std::endl;
+        glDeleteShader(shdrId);
+        return 0;
+    }
 
     return shdrId;
 
 }
 
-static int createShader(const std::string& vertexShader, const std::string& fragmentShader) {
+static unsigned int createShader(const std::string& vertexShader, const std::string& fragmentShader) {
     unsigned int program = glCreateProgram();
     unsigned int vertexShdr = compileShader(GL_VERTEX_SHADER, vertexShader);
-    
+    unsigned int fragmentShdr = compileShader(GL_FRAGMENT_SHADER, fragmentShader);
+
+    glAttachShader(program, vertexShdr);
+    glAttachShader(program, fragmentShdr);
+    glLinkProgram(program);
+    glValidateProgram(program);
+
+    //the shaders could actually be deleted since they are already linked. The obj files are deleted
+    glDeleteShader(vertexShdr);
+    glDeleteShader(fragmentShdr);
+
+    return program;
 
 }
 
@@ -75,6 +103,21 @@ int main(void)
 
     glBindBuffer(GL_ARRAY_BUFFER, 0);
 
+    std::string vertexShader = "#version 330 core\n"
+        "\n"
+        "layout(location = 0) in vec4 position;\n"
+        "void main(){\n"
+        "gl_position = position; "
+        "\n}";
+    std::string fragmentShader = "#version 330 core\n"
+        "\n"
+        "layout(location = 0) out vec4 color;\n"
+        "void main(){\n"
+        "color = vec4(1.0, 0.0, 0.0, 1.0) ; "
+        "\n}";
+
+    unsigned int shader = createShader(vertexShader, fragmentShader);
+    glUseProgram(shader);
 
     /* Loop until the user closes the window */
     while (!glfwWindowShouldClose(window))
