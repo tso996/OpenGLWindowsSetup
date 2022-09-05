@@ -14,6 +14,57 @@
 #include <GL/glew.h>
 #include <GLFW/glfw3.h>
 #include <iostream>
+#include <fstream>
+#include <sstream>
+#include <filesystem>
+
+struct ShaderProgramSource
+{
+    std::string vertexSource{};
+    std::string fragmentSource{};
+};
+
+static ShaderProgramSource parseShader(const std::string& filepath) {
+
+    std::cout << filepath << std::endl;
+    std::cout << "current working:" << std::filesystem::current_path() << std::endl;
+    std::ifstream stream(filepath);
+    std::ifstream infile(filepath);
+    if (infile.good()) {
+        std::cout << "file found" << std::endl;
+    }
+    enum class ShaderType {
+    NONE = -1, VERTEX = 0, FRAGMENT = 1
+    };
+
+    std::string line;
+    std:: stringstream ss[2];
+
+    ShaderType type = ShaderType::NONE;
+
+    while (getline(stream, line)) {
+        if (line.find("#shader") != std::string::npos) {
+            if (line.find("vertex") != std::string::npos) {
+                type = ShaderType::VERTEX;
+            }
+            else if (line.find("fragment") != std::string::npos) {
+                type = ShaderType::FRAGMENT;
+            }
+        }
+        else {
+            ss[(int)type] << line << '\n';
+        }
+        
+    }
+
+    ShaderProgramSource sp;
+    sp.vertexSource = ss[0].str();
+    sp.fragmentSource = ss[1].str();
+    return sp;
+
+}
+
+
 
 static int compileShader(unsigned int type, const std::string& source) {//it needs to actually be a reference to the original string so that the pointer is valid even if the function is over
     unsigned int shdrId = glCreateShader(type);
@@ -70,7 +121,7 @@ int main(void)
 
     
     /* Create a windowed mode window and its OpenGL context */
-    window = glfwCreateWindow(640, 480, "Hello World", NULL, NULL);
+    window = glfwCreateWindow(640, 480, "OpenGL Setup", NULL, NULL);
     if (!window)
     {
         glfwTerminate();
@@ -103,6 +154,12 @@ int main(void)
 
     glBindBuffer(GL_ARRAY_BUFFER, 0);
 
+    ShaderProgramSource source = parseShader("Res/Shaders/Basic.shader");
+
+    std::cout << "VERTEX" << std::endl;
+    std::cout << source.vertexSource << std::endl;
+    
+    
     std::string vertexShader = "#version 330 core\n"
         "\n"
         "layout(location = 0) in vec4 position;"
