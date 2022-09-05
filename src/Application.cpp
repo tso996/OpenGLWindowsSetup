@@ -160,7 +160,7 @@ int main(void)
     std::cout << source.vertexSource << std::endl;
     
     
-    std::string vertexShader = "#version 330 core\n"
+    /*std::string vertexShader = "#version 330 core\n"
         "\n"
         "layout(location = 0) in vec4 position;"
         "void main(){\n"
@@ -172,9 +172,9 @@ int main(void)
         "layout(location = 0) out vec4 color;\n"
         "void main(){\n"
         "color = vec4(1.0, 0.0, 0.0, 1.0) ; "
-        "\n}";
+        "\n}";*/
 
-    unsigned int shader = createShader(vertexShader, fragmentShader);
+    unsigned int shader = createShader(source.vertexSource, source.fragmentSource);
     glUseProgram(shader);
 
     /* Loop until the user closes the window */
