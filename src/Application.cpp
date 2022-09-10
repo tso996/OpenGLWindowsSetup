@@ -155,6 +155,9 @@ int main(void)
     /* Make the window's context current */
     glfwMakeContextCurrent(window);
 
+    glfwSwapInterval(1);
+
+
     if (glewInit() != GLEW_OK) {
         std::cout << "GLEW did not initialize properly!" << std::endl;
     }
@@ -213,8 +216,14 @@ int main(void)
         "\n}";*/
 
     unsigned int shader = createShader(source.vertexSource, source.fragmentSource);
-    glUseProgram(shader);
+    GLCALL(glUseProgram(shader));
 
+    GLCALL(int location = glGetUniformLocation(shader, "u_color"));//find the variable
+    ASSERT(location != -1);//location is -1, so stop it could not be found
+    GLCALL(glUniform4f(location, 0.8, 0.3, 0.8, 1.0));//set the variable
+
+    float r = 0.0f;
+    float increment = 0.05f;
     /* Loop until the user closes the window */
     while (!glfwWindowShouldClose(window))
     {
@@ -222,11 +231,19 @@ int main(void)
         GLCALL(glClear(GL_COLOR_BUFFER_BIT));
 
         //glClearError();//The error handler we made. Another reason start needs to be in caps
-        //STILL THROWS 502 ERROR. SOLVE IT.
+
+        GLCALL(glUniform4f(location, r, 0.3, 0.8, 1.0));//set the variable
         GLCALL(glDrawElements(GL_TRIANGLES, 6, GL_UNSIGNED_INT, nullptr));
         //ASSERT(errorLogging::glLogCall());
 
 
+        if (r > 1.0f) {
+            increment = -0.05f;
+        }
+        if (r < 0.0f) {
+            increment = 0.05;
+        }
+        r += increment;
         //glEnd();
 
 
