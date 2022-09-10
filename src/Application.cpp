@@ -18,6 +18,28 @@
 #include <sstream>
 #include <filesystem>
 
+#define ASSERT(x) if (!(x)) __debugbreak();
+#define GLCALL(x) errorLogging::glClearError();\
+x;\
+ASSERT(errorLogging::glLogCall(#x, __FILE__, __LINE__))
+
+namespace errorLogging {
+    static void glClearError() {
+        while (glGetError != GL_NO_ERROR) {
+
+        }
+    }
+
+    static bool glLogCall(const char* function, const char* file, int line) {
+        while (GLenum error = glGetError()) {
+            std::cout << "[OpenGL error: " << error <<": "<<function<<" "<< file<< " "<< line<< std::endl;
+            return false;
+        }
+
+        return true;
+    }
+}
+
 struct ShaderProgramSource
 {
     std::string vertexSource{};
@@ -69,11 +91,11 @@ static ShaderProgramSource parseShader(const std::string& filepath) {
 static int compileShader(unsigned int type, const std::string& source) {//it needs to actually be a reference to the original string so that the pointer is valid even if the function is over
     unsigned int shdrId = glCreateShader(type);
     const char* shdrCode = source.c_str();
-    glShaderSource(shdrId, 1, &shdrCode, NULL);
-    glCompileShader(shdrId);
+    GLCALL(glShaderSource(shdrId, 1, &shdrCode, NULL));
+    GLCALL(glCompileShader(shdrId));
     //maybe some error handling here
     int result{};
-    glGetShaderiv(shdrId, GL_COMPILE_STATUS, &result);
+    GLCALL(glGetShaderiv(shdrId, GL_COMPILE_STATUS, &result));
 
     if (result!=GL_FALSE) {
         std::cout << "shader compiled ok.." << std::endl;
@@ -81,11 +103,11 @@ static int compileShader(unsigned int type, const std::string& source) {//it nee
     else {
         std::cout << "shader compilation error" << std::endl;
         int length{};
-        glGetShaderiv(shdrId, GL_INFO_LOG_LENGTH, &length);
+        GLCALL(glGetShaderiv(shdrId, GL_INFO_LOG_LENGTH, &length));
         char* message = (char*)alloca(sizeof(char) * length);
-        glGetShaderInfoLog(shdrId, length, &length, message);
+        GLCALL(glGetShaderInfoLog(shdrId, length, &length, message));
         std::cout << "could not compile correctly: " << (type == GL_VERTEX_SHADER ? "vertex" : "fragment") << std::endl;
-        glDeleteShader(shdrId);
+        GLCALL(glDeleteShader(shdrId));
         return 0;
     }
 
@@ -98,18 +120,20 @@ static unsigned int createShader(const std::string& vertexShader, const std::str
     unsigned int vertexShdr = compileShader(GL_VERTEX_SHADER, vertexShader);
     unsigned int fragmentShdr = compileShader(GL_FRAGMENT_SHADER, fragmentShader);
 
-    glAttachShader(program, vertexShdr);
-    glAttachShader(program, fragmentShdr);
-    glLinkProgram(program);
-    glValidateProgram(program);
+    GLCALL(glAttachShader(program, vertexShdr));
+    GLCALL(glAttachShader(program, fragmentShdr));
+    GLCALL(glLinkProgram(program));
+    GLCALL(glValidateProgram(program));
 
     //the shaders could actually be deleted since they are already linked. The obj files are deleted
-    glDeleteShader(vertexShdr);
-    glDeleteShader(fragmentShdr);
+    GLCALL(glDeleteShader(vertexShdr));
+    GLCALL(glDeleteShader(fragmentShdr));
 
     return program;
 
 }
+
+
 
 int main(void)
 {
@@ -195,13 +219,15 @@ int main(void)
     while (!glfwWindowShouldClose(window))
     {
         /* Render here */
-        glClear(GL_COLOR_BUFFER_BIT);
+        GLCALL(glClear(GL_COLOR_BUFFER_BIT));
+
+        //glClearError();//The error handler we made. Another reason start needs to be in caps
+        //STILL THROWS 502 ERROR. SOLVE IT.
+        GLCALL(glDrawElements(GL_TRIANGLES, 6, GL_UNSIGNED_INT, nullptr));
+        //ASSERT(errorLogging::glLogCall());
 
 
-        glDrawElements(GL_TRIANGLES, 6, GL_UNSIGNED_INT, nullptr);
-
-
-        glEnd();
+        //glEnd();
 
 
         /* Swap front and back buffers */
@@ -210,7 +236,7 @@ int main(void)
         /* Poll for and process events */
         glfwPollEvents();
     }
-    glDeleteProgram(shader);
+    GLCALL(glDeleteProgram(shader));
 
     glfwTerminate();
     return 0;
