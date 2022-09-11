@@ -51,6 +51,18 @@ int main(int args, char* argv[]) {
 	//setting up callbacks to handle window resizing
 	glfwSetFramebufferSizeCallback(window, framebuffer_size_callback);
 
+	float vertices[9] = {
+		-0.5f, -0.5f, 0.0f,
+		 0.5f, -0.5f, 0.0f,
+		 0.0f, 0.5f, 0.0f
+	};
+
+	unsigned int vertexBufferObject;
+	glGenBuffers(1, &vertexBufferObject);
+	glBindBuffer(GL_ARRAY_BUFFER, vertexBufferObject);
+	glBufferData(GL_ARRAY_BUFFER, sizeof(vertices), vertices, GL_STATIC_DRAW);
+
+
 
 	while (!glfwWindowShouldClose(window)) {
 		processInput(window);
