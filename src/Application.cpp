@@ -25,7 +25,9 @@ int main(int args, char* argv[]) {
 	}
 	else {
 		std::cout << "Window initialised ok" << std::endl;
-	}
+	}	
+
+	glfwMakeContextCurrent(window);
 
 
 
@@ -39,10 +41,17 @@ int main(int args, char* argv[]) {
 
 	glViewport(0, 0, 800, 600);//first 2 parameter are the lower left corner of the window
 
+
 	//setting up callbacks to handle window resizing
 	glfwSetFramebufferSizeCallback(window, framebuffer_size_callback);
 
 
+	while (!glfwWindowShouldClose(window)) {
+		glfwSwapBuffers(window);
+		glfwPollEvents();
+	}
+
+	glfwTerminate();
 	return 0;
 }
 
