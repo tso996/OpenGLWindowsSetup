@@ -1,16 +1,3 @@
-//#include<glad/glad.h>>
-//#include<GLFW/glfw3.h>
-//
-//int main(void) {
-//
-//    glfwInit();
-//    glfwWindowHint(GLFW_CONTEXT_VERSION_MAJOR, 3);
-//    glfwWindowHint(GLFW_CONTEXT_VERSION_MINOR, 3);
-//    glfwWindowHint(GLFW_OPENGL_PROFILE, GLFW_OPENGL_CORE_PROFILE);
-//    //glfwWindowHint(GLFW_OPENGL_FORWARD_COMPAT, GL_TRUE);
-//	return 0;
-//}
-
 #include <GL/glew.h>
 #include <GLFW/glfw3.h>
 #include <iostream>
@@ -89,7 +76,7 @@ static ShaderProgramSource parseShader(const std::string& filepath) {
 
 
 static int compileShader(unsigned int type, const std::string& source) {//it needs to actually be a reference to the original string so that the pointer is valid even if the function is over
-    unsigned int shdrId = glCreateShader(type);
+    GLuint shdrId = glCreateShader(type);
     const char* shdrCode = source.c_str();
     GLCALL(glShaderSource(shdrId, 1, &shdrCode, NULL));
     GLCALL(glCompileShader(shdrId));
@@ -144,6 +131,12 @@ int main(void)
         return -1;
 
     
+
+    //setting up the opengl version to use
+    glfwWindowHint(GLFW_CONTEXT_VERSION_MAJOR, 3);
+    glfwWindowHint(GLFW_CONTEXT_VERSION_MINOR, 3);
+    glfwWindowHint(GLFW_OPENGL_PROFILE, GLFW_OPENGL_CORE_PROFILE);
+
     /* Create a windowed mode window and its OpenGL context */
     window = glfwCreateWindow(640, 480, "OpenGL Setup", NULL, NULL);
     if (!window)
@@ -191,7 +184,7 @@ int main(void)
     glBindBuffer(GL_ELEMENT_ARRAY_BUFFER, indexBuffer);
     glBufferData(GL_ELEMENT_ARRAY_BUFFER, sizeof(float) * 6, indices, GL_STATIC_DRAW);
 
-    glBindBuffer(GL_ARRAY_BUFFER, 0);
+    //glBindBuffer(GL_ARRAY_BUFFER, 0);
 
     ShaderProgramSource source = parseShader("Res/Shaders/Basic.shader");
 
@@ -222,6 +215,10 @@ int main(void)
     ASSERT(location != -1);//location is -1, so stop it could not be found
     GLCALL(glUniform4f(location, 0.8, 0.3, 0.8, 1.0));//set the variable
 
+    GLCALL(glBindBuffer(GL_ELEMENT_ARRAY_BUFFER, 0));
+    GLCALL(glBindBuffer(GL_ARRAY_BUFFER, 0));
+    GLCALL(glUseProgram(0));
+
     float r = 0.0f;
     float increment = 0.05f;
     /* Loop until the user closes the window */
@@ -232,7 +229,18 @@ int main(void)
 
         //glClearError();//The error handler we made. Another reason start needs to be in caps
 
+
+        GLCALL(glBindBuffer(GL_ARRAY_BUFFER, buffer));
+        GLCALL(glVertexAttribPointer(0, 2, GL_FLOAT, GL_FALSE, sizeof(float) * 2, 0));
+        GLCALL(glEnableVertexAttribArray(0));
+
+        GLCALL(glBindBuffer(GL_ELEMENT_ARRAY_BUFFER, indexBuffer));
+
+
+        GLCALL(glUseProgram(shader));
         GLCALL(glUniform4f(location, r, 0.3, 0.8, 1.0));//set the variable
+        
+        
         GLCALL(glDrawElements(GL_TRIANGLES, 6, GL_UNSIGNED_INT, nullptr));
         //ASSERT(errorLogging::glLogCall());
 
@@ -241,9 +249,10 @@ int main(void)
             increment = -0.05f;
         }
         if (r < 0.0f) {
-            increment = 0.05;
+            increment = 0.05f;
         }
         r += increment;
+        
         //glEnd();
 
 
