@@ -132,12 +132,31 @@ int main(int args, char* argv[]) {
 	glDeleteShader(vertexShader);
 	glDeleteShader(fragmentShader);
 
+
+	unsigned int VAO;
+	glGenVertexArrays(1, &VAO);
+
+	glBindVertexArray(VAO);
+	// 2. copy our vertices array in a buffer for OpenGL to use
+	glBindBuffer(GL_ARRAY_BUFFER, vertexBufferObject);
+	glBufferData(GL_ARRAY_BUFFER, sizeof(vertices), vertices, GL_STATIC_DRAW);
+
+	//The first parameter here corresponds to the location variable set to 0 in the vertexshader source
+	glVertexAttribPointer(0, 3, GL_FLOAT, GL_FALSE, 3 * sizeof(float), (void*)0);
+	glEnableVertexAttribArray(0);
+
+	
+
+	//render loop
 	while (!glfwWindowShouldClose(window)) {
 		processInput(window);
 		//rendering commands
 		glClearColor(0.1f, 0.2f, 0.3f, 1.0f);
 		glClear(GL_COLOR_BUFFER_BIT);
 
+		glUseProgram(shaderProgram);
+		glBindVertexArray(VAO);
+		glDrawArrays(GL_TRIANGLES, 0, 3);
 
 		//check for events and swap buffers
 		glfwSwapBuffers(window);
