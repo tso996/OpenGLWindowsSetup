@@ -1,6 +1,6 @@
 #include <glad/glad.h>
 #include <GLFW/glfw3.h>
-
+#include <vector>
 #include <iostream>
 
 // process all input: query GLFW whether relevant keys are pressed/released this frame and react accordingly
@@ -39,6 +39,8 @@ const char* fragmentShaderSource = "#version 330 core\n"
 
 int main()
 {
+    std::vector<int> a;
+    a.push_back(5);
     // glfw: initialize and configure
     // ------------------------------
     glfwInit();
@@ -184,6 +186,10 @@ int main()
     glBufferData(GL_ELEMENT_ARRAY_BUFFER, sizeof(indices), indices, GL_STATIC_DRAW);
 
 
+
+    int maxVertexAttributes;
+    glGetIntegerv(GL_MAX_VERTEX_ATTRIBS, &maxVertexAttributes);
+    std::cout << maxVertexAttributes << std::endl;
 
     // uncomment this call to draw in wireframe polygons.
     //glPolygonMode(GL_FRONT_AND_BACK, GL_LINE);
