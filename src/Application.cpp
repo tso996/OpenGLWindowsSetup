@@ -36,10 +36,12 @@ const char* vertexShaderSource = "#version 330 core\n"
 //output from fragment shader is pixel
 const char* fragmentShaderSource = "#version 330 core\n"
 "out vec4 FragColor;\n"
-"in vec4 vertexColor;"
+//"in vec4 vertexColor;"
+"uniform vec4 newColor;\n"
 "void main()\n"
 "{\n"
-"   FragColor = vertexColor;\n"
+//"   FragColor = vertexColor;\n"
+"   FragColor = newColor;\n"
 "}\n\0";
 
 int main()
@@ -196,7 +198,8 @@ int main()
     glGetIntegerv(GL_MAX_VERTEX_ATTRIBS, &maxVertexAttributes);
     std::cout << maxVertexAttributes << std::endl;
 
-    // uncomment this call to draw in wireframe polygons.
+
+       // uncomment this call to draw in wireframe polygons.
     //glPolygonMode(GL_FRONT_AND_BACK, GL_LINE);
 
     // render loop
@@ -214,6 +217,11 @@ int main()
 
         // draw our first triangle
         glUseProgram(shaderProgram);
+
+        float timeValue = glfwGetTime();
+        float greenValue = (sin(timeValue) / 2.0f) + 0.5f;
+        int vertexColorLocation = glGetUniformLocation(shaderProgram, "newColor");
+        glUniform4f(vertexColorLocation, 0.0f, greenValue, 0.0f, 1.0f);
         glBindVertexArray(VAO1); // seeing as we only have a single VAO there's no need to bind it every time, but we'll do so to keep things a bit more organized
         //glDrawArrays(GL_TRIANGLES, 0, 3);
         glDrawElements(GL_TRIANGLES, 6, GL_UNSIGNED_INT, 0);
