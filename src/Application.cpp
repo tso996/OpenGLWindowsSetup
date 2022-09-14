@@ -175,8 +175,8 @@ int main()
     glGenBuffers(1, &vertexBufferObject1);
     glBindBuffer(GL_ARRAY_BUFFER, vertexBufferObject1);
     glBufferData(GL_ARRAY_BUFFER, sizeof(vertices1), vertices1, GL_STATIC_DRAW);
-    glVertexAttribPointer(0, 3, GL_FLOAT, GL_FALSE, 3 * sizeof(float), (void*)0);
-    glEnableVertexAttribArray(0);
+    glVertexAttribPointer(0, 3, GL_FLOAT, GL_FALSE, 3 * sizeof(float), (void*)0);// The index (first parameter) corresponds to the location value in the shader
+    glEnableVertexAttribArray(0);//The value here corresponds to the location value in the vertex shader
 
     //Make the Element buffer object, these are also in the VAO
     unsigned int elementBufferObject;
