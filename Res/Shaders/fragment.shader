@@ -9,6 +9,6 @@
 
  void main()  
  {  
-    FragColor = texture(ourTexture, texCoord);  
+    FragColor = texture(ourTexture, texCoord) * vec4(vertexColor, 1.0);  
 //    FragColor = newColor;  
  };
