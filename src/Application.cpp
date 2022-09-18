@@ -3,6 +3,7 @@
 #include <vector>
 #include <iostream>
 #include "Shader.h"
+#include "stb_image.h"
 
 // process all input: query GLFW whether relevant keys are pressed/released this frame and react accordingly
 // ---------------------------------------------------------------------------------------------------------
@@ -82,7 +83,7 @@ int main()
         return -1;
     }
 
-
+   
     //// build and compile our shader program
     //// ------------------------------------
     Shader shader = Shader("Res/Shaders/vertex.shader", "Res/Shaders/fragment.shader");
@@ -127,12 +128,41 @@ int main()
     glBindBuffer(GL_ARRAY_BUFFER,0);
     glBindVertexArray(0);
     
+    //DEALING WITH TEXTURES
+    int width, height, nrChannels;
+    unsigned char* data = stbi_load("Res/Textures/container.jpg", &width, &height, &nrChannels, 0);
+    unsigned int textureID;
+    glGenTextures(1, &textureID);
+    glBindTexture(GL_TEXTURE_2D, textureID);
+
+    // set the texture wrapping/filtering options (on the currently bound texture object)
+    glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_WRAP_S, GL_REPEAT);
+    glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_WRAP_T, GL_REPEAT);
+    glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_MIN_FILTER, GL_LINEAR_MIPMAP_LINEAR);
+    glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_MAG_FILTER, GL_LINEAR);
+
+    // load and generate the texture
+    if (data)
+    {
+        glTexImage2D(GL_TEXTURE_2D, 0, GL_RGB, width, height, 0, GL_RGB, GL_UNSIGNED_BYTE, data);
+        glGenerateMipmap(GL_TEXTURE_2D);
+        std::cout << "Texture loaded properly" << std::endl;
+    }
+    else {
+        std::cout << "Textures could not load properly" << std::endl;
+    }
+
+    stbi_image_free(data);//Since the texture and it's mipmaps are generated the data could be freed;
+
+
+    //RECTANGLE
     //The redundant positions are removed
     float vertices1[] = {
-     0.5f,  0.5f, 0.0f,  // top right 0
-     0.5f, -0.5f, 0.0f,  // bottom right 1
-    -0.5f, -0.5f, 0.0f,  // bottom left 2
-    -0.5f,  0.5f, 0.0f   // top left  3
+        // positions          // colors           // texture coords
+        0.5f,  0.5f, 0.0f,   1.0f, 0.0f, 0.0f,   1.0f, 1.0f,   // top right
+        0.5f, -0.5f, 0.0f,   0.0f, 1.0f, 0.0f,   1.0f, 0.0f,   // bottom right
+       -0.5f, -0.5f, 0.0f,   0.0f, 0.0f, 1.0f,   0.0f, 0.0f,   // bottom left
+       -0.5f,  0.5f, 0.0f,   1.0f, 1.0f, 0.0f,   0.0f, 1.0f    // top left 
     };
     
     unsigned int indices[] = {
@@ -142,14 +172,20 @@ int main()
 
     unsigned int VAO1, vertexBufferObject1;
     glGenVertexArrays(1, &VAO1);
-
     glBindVertexArray(VAO1);
 
     glGenBuffers(1, &vertexBufferObject1);
     glBindBuffer(GL_ARRAY_BUFFER, vertexBufferObject1);
     glBufferData(GL_ARRAY_BUFFER, sizeof(vertices1), vertices1, GL_STATIC_DRAW);
-    glVertexAttribPointer(0, 3, GL_FLOAT, GL_FALSE, 3 * sizeof(float), (void*)0);// The index (first parameter) corresponds to the location value in the shader
+    
+    glVertexAttribPointer(0, 3, GL_FLOAT, GL_FALSE, 8 * sizeof(float), (void*)0);// The index (first parameter) corresponds to the location value in the shader
     glEnableVertexAttribArray(0);//The value here corresponds to the location value in the vertex shader
+
+    glVertexAttribPointer(1, 3, GL_FLOAT, GL_FALSE, 8 * sizeof(float), (void*)(3 * sizeof(float)));
+    glEnableVertexAttribArray(1);
+
+    glVertexAttribPointer(2, 2, GL_FLOAT, GL_FALSE, 8 * sizeof(float), (void*)(2 * 3 * sizeof(float)));
+    glEnableVertexAttribArray(2);
 
     //Make the Element buffer object, these are also in the VAO
     unsigned int elementBufferObject;
@@ -213,12 +249,11 @@ int main()
         int vertexColorLocation = glGetUniformLocation(shaderProgram, "newColor");
         glUniform4f(vertexColorLocation, 0.0f, greenValue, 0.0f, 1.0f);
       */
-        glBindVertexArray(VAO2); // seeing as we only have a single VAO there's no need to bind it every time, but we'll do so to keep things a bit more organized
-        glDrawArrays(GL_TRIANGLES, 0, 3);
+        glBindVertexArray(VAO1); // seeing as we only have a single VAO there's no need to bind it every time, but we'll do so to keep things a bit more organized
+       // glDrawArrays(GL_TRIANGLES, 0, 3);
         
-        /*glBindVertexArray(VAO1);
         glDrawElements(GL_TRIANGLES, 6, GL_UNSIGNED_INT, 0);
-        */
+        
         glBindVertexArray(0); // no need to unbind it every time 
 
         // glfw: swap buffers and poll IO events (keys pressed/released, mouse moved etc.)
@@ -235,7 +270,7 @@ int main()
     glDeleteBuffers(1, &vertexBufferObject2);
     glDeleteBuffers(1, &vertexBufferObject1);
     glDeleteBuffers(1, &VBO);
-    glDeleteProgram(shaderProgram);
+    glDeleteProgram(shader.getID());
 
     // glfw: terminate, clearing all previously allocated GLFW resources.
     // ------------------------------------------------------------------
