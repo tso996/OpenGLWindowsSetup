@@ -153,7 +153,7 @@ int main()
     }
 
     stbi_image_free(data);//Since the texture and it's mipmaps are generated the data could be freed;
-
+    glBindTexture(GL_TEXTURE_2D, 0);
 
     //RECTANGLE
     //The redundant positions are removed
@@ -249,6 +249,7 @@ int main()
         int vertexColorLocation = glGetUniformLocation(shaderProgram, "newColor");
         glUniform4f(vertexColorLocation, 0.0f, greenValue, 0.0f, 1.0f);
       */
+        glBindTexture(GL_TEXTURE_2D, textureID);
         glBindVertexArray(VAO1); // seeing as we only have a single VAO there's no need to bind it every time, but we'll do so to keep things a bit more organized
        // glDrawArrays(GL_TRIANGLES, 0, 3);
         
