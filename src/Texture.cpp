@@ -22,17 +22,18 @@ Texture::Texture(const char* path) {
         {
             //Finding the extension of the texture file. OpenGL throws error if jpg and png channels are not defined correctly
             if (p.substr((p.find_last_of(".") + 1)) == "png"){
-                glTexImage2D(GL_TEXTURE_2D, 0, GL_RGB, width, height, 0, GL_RGBA, GL_UNSIGNED_BYTE, data);//GL_RGBA for png and GL_RGB for jpg
+                glTexImage2D(GL_TEXTURE_2D, 0, GL_RGB, width, height, 0, GL_RGBA/*For png*/, GL_UNSIGNED_BYTE, data);//GL_RGBA for png and GL_RGB for jpg
             }
             else {
-                glTexImage2D(GL_TEXTURE_2D, 0, GL_RGB, width, height, 0, GL_RGB, GL_UNSIGNED_BYTE, data);//GL_RGBA for png and GL_RGB for jpg
+                glTexImage2D(GL_TEXTURE_2D, 0, GL_RGB, width, height, 0, GL_RGB/*For jpg*/, GL_UNSIGNED_BYTE, data);//GL_RGBA for png and GL_RGB for jpg
             }
+
             glGenerateMipmap(GL_TEXTURE_2D);
-            std::cout << "Texture1 loaded properly and mipmap generated" << std::endl;
+            std::cout << "Texture '"<<path<<"' loaded properly and mipmap generated" << std::endl;
         }
         else
         {
-            std::cout << "Textures could not load properly" << std::endl;
+            std::cout << "Textures could not load properly. Check the texture path provided." << std::endl;
         }
 
         stbi_image_free(data);//Since the texture and it's mipmaps are generated the data could be freed;

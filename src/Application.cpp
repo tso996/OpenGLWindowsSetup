@@ -27,27 +27,6 @@ void framebuffer_size_callback(GLFWwindow* window, int width, int height)
 const unsigned int SCR_WIDTH = 800;
 const unsigned int SCR_HEIGHT = 600;
 
-//const char* vertexShaderSource = 
-//"#version 330 core\n"
-//"layout (location = 0) in vec3 aPos;\n"
-//"layout (location = 1) in vec3 aColor;\n"
-//"out vec3 vertexColor;\n"
-//"void main()\n"
-//"{\n"
-//"   gl_Position = vec4(aPos, 1.0);\n"
-//"   vertexColor = aColor;\n"
-//"}\0";
-//
-////output from fragment shader is pixel
-//const char* fragmentShaderSource = "#version 330 core\n"
-//"out vec4 FragColor;\n"
-//"in vec3 vertexColor;"
-////"uniform vec4 newColor;\n"
-//"void main()\n"
-//"{\n"
-//"   FragColor = vec4(vertexColor, 1.0);\n"
-////"   FragColor = newColor;\n"
-//"}\n\0";
 
 int main()
 {

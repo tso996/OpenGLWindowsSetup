@@ -13,10 +13,7 @@ class Texture {
 public:
 	Texture(const char* path);
 
-    inline unsigned int getID()const
-    {
-        return ID;
-    }
+    inline unsigned int getID()const{ return ID; }
 };
 
 
