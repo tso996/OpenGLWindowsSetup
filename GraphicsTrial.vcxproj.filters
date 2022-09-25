@@ -27,6 +27,9 @@
     <ClCompile Include="src\stb_image.cpp">
       <Filter>Source Files</Filter>
     </ClCompile>
+    <ClCompile Include="src\Texture.cpp">
+      <Filter>Source Files</Filter>
+    </ClCompile>
   </ItemGroup>
   <ItemGroup>
     <None Include="Res\Shaders\Basic.shader" />
@@ -40,9 +43,18 @@
     <ClInclude Include="include\stb_image.h">
       <Filter>Header Files</Filter>
     </ClInclude>
+    <ClInclude Include="include\Texture.h">
+      <Filter>Header Files</Filter>
+    </ClInclude>
   </ItemGroup>
   <ItemGroup>
     <Image Include="Res\Textures\wall.jpg">
+      <Filter>Resource Files</Filter>
+    </Image>
+    <Image Include="Res\Textures\container.jpg">
+      <Filter>Resource Files</Filter>
+    </Image>
+    <Image Include="Res\Textures\awesomeface.png">
       <Filter>Resource Files</Filter>
     </Image>
   </ItemGroup>

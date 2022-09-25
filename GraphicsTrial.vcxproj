@@ -159,6 +159,7 @@
     <ClCompile Include="src\stb_image.cpp" />
     <ClCompile Include="src\Application.cpp" />
     <ClCompile Include="src\glad.c" />
+    <ClCompile Include="src\Texture.cpp" />
   </ItemGroup>
   <ItemGroup>
     <None Include="Res\Shaders\Basic.shader" />
@@ -168,8 +169,11 @@
   <ItemGroup>
     <ClInclude Include="include\Shader.h" />
     <ClInclude Include="include\stb_image.h" />
+    <ClInclude Include="include\Texture.h" />
   </ItemGroup>
   <ItemGroup>
+    <Image Include="Res\Textures\awesomeface.png" />
+    <Image Include="Res\Textures\container.jpg" />
     <Image Include="Res\Textures\wall.jpg" />
   </ItemGroup>
   <Import Project="$(VCTargetsPath)\Microsoft.Cpp.targets" />

@@ -3,6 +3,7 @@
 #include <vector>
 #include <iostream>
 #include "Shader.h"
+#include "Texture.h"
 #include "stb_image.h"
 
 // process all input: query GLFW whether relevant keys are pressed/released this frame and react accordingly
@@ -89,7 +90,8 @@ int main()
     Shader shader = Shader("Res/Shaders/vertex.shader", "Res/Shaders/fragment.shader");
     // set up vertex data (and buffer(s)) and configure vertex attributes
     // ------------------------------------------------------------------
-    float vertices0[] = {
+    float vertices0[] = 
+    {
         -0.5f, -0.5f, 0.0f, // left  
          0.5f, -0.5f, 0.0f, // right 
          0.0f,  0.5f, 0.0f  // top   
@@ -128,36 +130,15 @@ int main()
     glBindBuffer(GL_ARRAY_BUFFER,0);
     glBindVertexArray(0);
     
-    //DEALING WITH TEXTURES
-    int width, height, nrChannels;
-    unsigned char* data = stbi_load("Res/Textures/container.jpg", &width, &height, &nrChannels, 0);
-    unsigned int textureID;
-    glGenTextures(1, &textureID);
-    glBindTexture(GL_TEXTURE_2D, textureID);
 
-    // set the texture wrapping/filtering options (on the currently bound texture object)
-    glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_WRAP_S, GL_REPEAT);
-    glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_WRAP_T, GL_REPEAT);
-    glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_MIN_FILTER, GL_LINEAR_MIPMAP_LINEAR);
-    glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_MAG_FILTER, GL_LINEAR);
+    Texture tex1 = Texture("Res/Textures/container.jpg");
+    Texture tex2 = Texture("Res/Textures/awesomeface.png");
 
-    // load and generate the texture
-    if (data)
-    {
-        glTexImage2D(GL_TEXTURE_2D, 0, GL_RGB, width, height, 0, GL_RGB, GL_UNSIGNED_BYTE, data);
-        glGenerateMipmap(GL_TEXTURE_2D);
-        std::cout << "Texture loaded properly and mipmap generated" << std::endl;
-    }
-    else {
-        std::cout << "Textures could not load properly" << std::endl;
-    }
-
-    stbi_image_free(data);//Since the texture and it's mipmaps are generated the data could be freed;
-    glBindTexture(GL_TEXTURE_2D, 0);//unbind current texture
 
     //RECTANGLE
     //The redundant positions are removed
-    float vertices1[] = {
+    float vertices1[] = 
+    {
         // positions          // colors           // texture coords
         0.5f,  0.5f, 0.0f,   1.0f, 0.0f, 0.0f,   1.0f, 1.0f,   // top right
         0.5f, -0.5f, 0.0f,   0.0f, 1.0f, 0.0f,   1.0f, 0.0f,   // bottom right
@@ -165,7 +146,8 @@ int main()
        -0.5f,  0.5f, 0.0f,   1.0f, 1.0f, 0.0f,   0.0f, 1.0f    // top left 
     };
     
-    unsigned int indices[] = {
+    unsigned int indices[] = 
+    {
         0, 1, 3,
         1, 2, 3 
     };
@@ -178,7 +160,7 @@ int main()
     glBindBuffer(GL_ARRAY_BUFFER, vertexBufferObject1);
     glBufferData(GL_ARRAY_BUFFER, sizeof(vertices1), vertices1, GL_STATIC_DRAW);
     
-    // The index (first parameter) corresponds to the location value in the shader, the stride is the distance between the attrib of one vertex to that attrib of the next vertex
+    // The index (first parameter) corresponds to the location value in the shader, the stride is the distance between the attrib of one vertex to that attrib of the next vertex(basically the size of a vertex in bytes, in this case, 32, ie. 8 * sizeof(float)
     glVertexAttribPointer(0, 3, GL_FLOAT, GL_FALSE, 8 * sizeof(float), (void*)0);
     glEnableVertexAttribArray(0);//The value here corresponds to the location value in the vertex shader
 
@@ -204,7 +186,8 @@ int main()
     std::cout << maxVertexAttributes << std::endl;
 
     //NEW VERTEX WITH MORE DATA
-    float vertices2[] = {
+    float vertices2[] = 
+    {
         // positions         // colors
     0.5f, -0.5f, 0.0f,  1.0f, 0.0f, 0.0f,   // bottom right
    -0.5f, -0.5f, 0.0f,  0.0f, 1.0f, 0.0f,   // bottom left
@@ -228,7 +211,11 @@ int main()
     glBindBuffer(GL_ARRAY_BUFFER, 0);
     glBindVertexArray(0);
 
-       // uncomment this call to draw in wireframe polygons.
+    shader.use();//glUseProgram(shader.getID());
+    glUniform1i(glGetUniformLocation(shader.getID(), "texture1"), 0);//Set the location of texture1 in the shader to 0
+    shader.setInt("texture2", 1);//The same function is defined in the Shader class as above
+
+    // uncomment this call to draw in wireframe polygons.
     //glPolygonMode(GL_FRONT_AND_BACK, GL_LINE);
 
     // render loop
@@ -251,7 +238,13 @@ int main()
         int vertexColorLocation = glGetUniformLocation(shaderProgram, "newColor");
         glUniform4f(vertexColorLocation, 0.0f, greenValue, 0.0f, 1.0f);
       */
-        glBindTexture(GL_TEXTURE_2D, textureID);
+        // GL_TEXTURE0 is active by default depending on the renderer
+        glActiveTexture(GL_TEXTURE0);
+        glBindTexture(GL_TEXTURE_2D, tex1.getID());
+
+        glActiveTexture(GL_TEXTURE1);
+        glBindTexture(GL_TEXTURE_2D, tex2.getID());
+        
         glBindVertexArray(VAO1); 
         
         glDrawElements(GL_TRIANGLES, 6, GL_UNSIGNED_INT, 0);
