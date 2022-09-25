@@ -4,6 +4,8 @@ Texture::Texture(const char* path) {
 
         std::string p = path;
         int width, height, nrChannels;
+
+        stbi_set_flip_vertically_on_load(true);
         unsigned char* data = stbi_load(path, &width, &height, &nrChannels, 0);
 
         glGenTextures(1, &ID);
