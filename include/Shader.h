@@ -1,4 +1,5 @@
-#pragma once
+#ifndef _SHADER_
+#define _SHADER_
 
 #include <glad/glad.h>
 
@@ -20,3 +21,4 @@ public:
 	void setInt(const std::string& name, int value) const;
 	void setFloat(const std::string& name, float value) const;
 };
+#endif
